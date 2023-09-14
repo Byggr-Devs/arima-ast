@@ -1,11 +1,12 @@
+import { RecoilRoot } from 'recoil'
 import './App.css'
 import Main from './pages/main'
 
 function App() {
   return (
-    <div>
+    <RecoilRoot>
       <Main />
-    </div>
+    </RecoilRoot>
   )
 }
 
