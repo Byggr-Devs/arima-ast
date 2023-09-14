@@ -7,7 +7,8 @@ type TRegistrationForm = {
   vehicleNumber: string;
   phoneNumber: string;
   serviceRequired: string;
-  extraServiceRequired: string;
+  extraServiceRequired: boolean;
+  extraServiceDays: number;
   estimatedDeliveryDate: string;
   priority: string;
 };
@@ -146,7 +147,7 @@ export default function RegistrationForm() {
             <label htmlFor="no">No</label>
           </div>
         </div>
-        {registrationForm.extraServiceRequired === "true" && (
+        {registrationForm.extraServiceRequired && (
           <div className="mb-6 flex gap-4 items-baseline">
             <label
               htmlFor="extraServiceDays"

@@ -3,25 +3,28 @@ import camera from "../assets/camera.png";
 import { isAdminAtom } from "../atoms";
 import { useRecoilState } from "recoil";
 
-// interface ILoginProps {
-//   setIsAdminUser: (loggedIn: number) => void;
-// }
+interface ILoginProps {
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-export default function Login() {
-  // const { setIsAdminUser } = props;
+export default function Login(props: ILoginProps) {
+  const { setIsLoggedIn } = props;
   const [isAdmin, setIsAdmin] = useRecoilState(isAdminAtom);
-
 
   const [user, setUser] = useState({ name: "", password: "" });
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
     if (user.name === "admin" && user.password === "admin") {
-      // setIsAdminUser(1);
       setIsAdmin(true);
+      setIsLoggedIn(true);
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("isAdmin", "true");
     } else if (user.name === "user" && user.password === "user") {
-      // setIsAdminUser(2);
       setIsAdmin(false);
+      setIsLoggedIn(true);
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("isAdmin", "false");
     } else {
       alert("Wrong Credentials");
     }
