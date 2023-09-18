@@ -1,48 +1,79 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { ServiceType, getRegistrationParams, register } from "../../api/registration";
 
 type TRegistrationForm = {
-  id: number;
-  name: string;
+  serviceCenterId: string;
+  ownerName: string;
   vehicleModel: string;
   vehicleNumber: string;
   phoneNumber: string;
-  serviceRequired: string;
+  servicesRequired: string[];
   extraServiceRequired: boolean;
   extraServiceDays: number;
-  estimatedDeliveryDate: string;
+  estimatedDeliveryTimestamp: string;
   priority: string;
 };
 
 export default function RegistrationForm() {
-  const [registrationForm, setRegistrationForm] = useState<TRegistrationForm>(
-    {} as TRegistrationForm
-  );
+  const [registrationForm, setRegistrationForm] = useState<TRegistrationForm>({
+    serviceCenterId: "sc-id1",
+    ownerName: "",
+    vehicleModel: "",
+    vehicleNumber: "",
+    phoneNumber: "",
+    servicesRequired: [],
+    extraServiceRequired: false,
+    extraServiceDays: 0,
+    estimatedDeliveryTimestamp: "",
+    priority: "",
+  });
 
-  const handleChange = (id: string, value: string | number | Date) => {
+  const [registrationParams, setRegistrationParams] = useState<{
+    serviceTypes: ServiceType[];
+    priorities: string[];
+  }>({
+    serviceTypes: [],
+    priorities: [],
+  });
+
+  useEffect(() => {
+    // console.log("registrationForm", registrationForm);
+    getRegistrationParams().then((res) => {
+      console.log("res", res);
+      setRegistrationParams(res);
+    });
+  }, []);
+
+  const handleChange = (
+    id: string,
+    value: string | string[] | Date | boolean
+  ) => {
     setRegistrationForm({ ...registrationForm, [id]: value });
   };
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    register(registrationForm);
     console.log("registrationForm", registrationForm);
   };
+  console.log("registrationForm", registrationForm);
   return (
     <div className="p-4 border rounded-md grid grid-cols-[1fr,2.5fr,1fr]">
       <div></div>
       <form className="" onSubmit={handleSubmit}>
         <div className="mb-6 flex gap-4 items-baseline">
           <label
-            htmlFor="name"
+            htmlFor="ownerName"
             className="block mb-2 text-sm font-medium text-gray-90 w-[11em]"
           >
             Owner Name
           </label>
           <input
             type="text"
-            id="name"
+            id="ownerName"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             placeholder="JohnDoe"
-            onChange={(e) => handleChange("name", e.target.value)}
+            onChange={(e) => handleChange("ownerName", e.target.value)}
             required
           />
         </div>
@@ -98,19 +129,32 @@ export default function RegistrationForm() {
             htmlFor="serviceRequired"
             className="block mb-2 text-sm font-medium text-gray-90 w-[11em]"
           >
-            Service Required
+            Services Required
           </label>
-          <select
-            id="serviceRequired"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            onChange={(e) => handleChange("serviceRequired", e.target.value)}
-            required
-          >
-            <option value="service1">Service 1</option>
-            <option value="service2">Service 2</option>
-            <option value="service3">Service 3</option>
-            <option value="service4">Service 4</option>
-          </select>
+          {registrationParams.serviceTypes.map((service) => (
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="serviceRequired"
+                name="serviceRequired"
+                value={service.id}
+                onChange={(e) => {
+                  const selectedServices =
+                    registrationForm.servicesRequired ?? [];
+                  if (e.target.checked) {
+                    selectedServices.push(e.target.value);
+                  } else {
+                    selectedServices.splice(
+                      selectedServices.indexOf(e.target.value),
+                      1
+                    );
+                  }
+                  handleChange("servicesRequired", selectedServices);
+                }}
+              />
+              <label htmlFor="serviceRequired">{service.name}</label>
+            </div>
+          ))}
         </div>
 
         <div className="mb-6 flex gap-4 items-baseline">
@@ -126,9 +170,7 @@ export default function RegistrationForm() {
               id="extraServiceRequired"
               name="extraServiceRequired"
               value="true"
-              onChange={(e) =>
-                handleChange("extraServiceRequired", e.target.value)
-              }
+              onChange={() => handleChange("extraServiceRequired", true)}
               required
             />
             <label htmlFor="yes">Yes</label>
@@ -139,9 +181,7 @@ export default function RegistrationForm() {
               id="extraServiceRequired"
               name="extraServiceRequired"
               value="false"
-              onChange={(e) =>
-                handleChange("extraServiceRequired", e.target.value)
-              }
+              onChange={() => handleChange("extraServiceRequired", false)}
               required
             />
             <label htmlFor="no">No</label>
@@ -169,12 +209,13 @@ export default function RegistrationForm() {
             Estimated Delivery Date
           </label>
           <input
-            type="date"
+            type="datetime-local"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             placeholder="Select a date"
             onChange={(e) =>
-              handleChange("estimatedDeliveryDate", e.target.value)
+              handleChange("estimatedDeliveryTimestamp", e.target.value)
             }
+            required
           />
         </div>
 
@@ -191,10 +232,10 @@ export default function RegistrationForm() {
             onChange={(e) => handleChange("priority", e.target.value)}
             required
           >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="urgent">Urgent</option>
+            <option value="">Select a priority</option>
+            {registrationParams.priorities.map((priority) => (
+              <option value={priority}>{priority}</option>
+            ))}
           </select>
         </div>
         <button
