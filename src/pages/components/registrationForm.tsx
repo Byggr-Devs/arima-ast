@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { ServiceType, getRegistrationParams, register } from "../../api/registration";
+import {
+  ServiceType,
+  getRegistrationParams,
+  register,
+} from "../../api/registration";
 
 type TRegistrationForm = {
   serviceCenterId: string;
