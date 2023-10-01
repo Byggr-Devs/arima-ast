@@ -20,7 +20,7 @@ type TRegistrationForm = {
 
 export default function RegistrationForm() {
   const [registrationForm, setRegistrationForm] = useState<TRegistrationForm>({
-    serviceCenterId: "sc-id1",
+    serviceCenterId: "service-center-1",
     ownerName: "",
     vehicleModel: "",
     vehicleNumber: "",
