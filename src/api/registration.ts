@@ -9,14 +9,15 @@ interface registerParams {
   extraServiceDays: number;
   estimatedDeliveryTimestamp: string;
   priority: string;
-    startTimestamp: string;
-
+  startTimestamp: string;
 }
 
 // api to post. Create a registration.
 export async function register(props: registerParams) {
-    props.startTimestamp = new Date().toISOString();
-    props.estimatedDeliveryTimestamp = new Date(props.estimatedDeliveryTimestamp).toISOString();
+  props.startTimestamp = new Date().toISOString();
+  props.estimatedDeliveryTimestamp = new Date(
+    props.estimatedDeliveryTimestamp
+  ).toISOString();
   const response = await fetch("http://localhost:8000/job", {
     method: "POST",
     headers: {
@@ -40,5 +41,15 @@ export async function getRegistrationParams(): Promise<resultFormat> {
   const result = await fetch("http://localhost:8000/registrationParams").then(
     (res) => res.json()
   );
+  return result.data;
+}
+
+export async function deleteJob({ jobId }: { jobId?: string }) {
+  if (!jobId) {
+    return;
+  }
+  const result = await fetch(`http://localhost:8000/delete-job/${jobId}`, {
+    method: "DELETE",
+  }).then((res) => res.json());
   return result.data;
 }
