@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getTrackings } from "../../api/tracking";
+import { getTrackings, updateTrackingStageStatus } from "../../api/tracking";
 
 interface Entry {
   id: string;
@@ -28,6 +28,7 @@ export default function TrackingForm() {
     stage: "",
     Date: "",
   });
+  const [filteredData, setFilteredData] = useState<Entry[]>(trackings);
 
   useEffect(() => {
     getTrackings().then((res) => {
@@ -36,10 +37,36 @@ export default function TrackingForm() {
     });
   }, []);
 
-  const handleSearchSubmit = (e: any) => {
-    e.preventDefault();
-    console.log("trackingForm", trackingForm);
-  };
+  useEffect(() => {
+    // filter trackings according to trackingForm
+
+    console.log("trackingForm");
+
+    if (!trackingForm.vehicleNumber && !trackingForm.Date) {
+      setFilteredData(trackings);
+      return;
+    }
+
+    // subString match for vehicleNumber
+
+    const filteredTrackings = trackings.filter((tracking) => {
+      if (trackingForm.vehicleNumber) {
+        const vehicleNumber = trackingForm.vehicleNumber;
+        const trackingVehicleNumber = tracking.vehicleNumber;
+        return trackingVehicleNumber.includes(vehicleNumber);
+      }
+
+      // date match
+      if (trackingForm.Date) {
+        const date = trackingForm.Date;
+        const trackingDate = tracking.estimatedDeliveryTimestamp;
+        return trackingDate >= date;
+      }
+      return true;
+    });
+
+    setFilteredData(filteredTrackings);
+  }, [trackings, trackingForm]);
 
   return (
     <div className="p-4 flex gap-4 flex-col">
@@ -55,13 +82,13 @@ export default function TrackingForm() {
             type="text"
             id="vehicleNumber"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            required
             onChange={(e) => {
               setTrackingForm({
                 ...trackingForm,
                 vehicleNumber: e.target.value,
               });
             }}
+            value={trackingForm.vehicleNumber ?? ""}
           />
         </div>
         <div className="mb-6">
@@ -80,7 +107,7 @@ export default function TrackingForm() {
                 vehicleModel: e.target.value,
               });
             }}
-            required
+            value={trackingForm.vehicleModel ?? ""}
           >
             <option>1</option>
             <option>2</option>
@@ -96,7 +123,7 @@ export default function TrackingForm() {
             onChange={(e) => {
               setTrackingForm({ ...trackingForm, stage: e.target.value });
             }}
-            required
+            value={trackingForm.stage ?? ""}
           >
             <option>1</option>
             <option>2</option>
@@ -114,21 +141,27 @@ export default function TrackingForm() {
             onChange={(e) => {
               setTrackingForm({ ...trackingForm, Date: e.target.value });
             }}
+            value={trackingForm.Date ?? ""}
           />
         </div>
-
-        <div></div>
-        <div></div>
-        <div></div>
 
         <button
           type="submit"
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          onClick={() => {
+            setFilteredData(trackings);
+            setTrackingForm({
+              vehicleNumber: "",
+              vehicleModel: "",
+              stage: "",
+              Date: "",
+            });
+          }}
         >
-          Submit
+          clear filters
         </button>
       </form>
-      <div>{Table(trackings)}</div>
+      <div>{Table(filteredData)}</div>
     </div>
   );
 }
@@ -136,6 +169,61 @@ export default function TrackingForm() {
 const Table = (entries: Entry[]) => {
   const [showStageEditModal, setShowStageEditModal] = useState<boolean>(false);
   const [showActionsModal, setShowActionsModal] = useState<boolean>(false);
+  const [selectedStage, setSelectedStage] = useState<string>();
+  const [updateJob, setUpdateJob] = useState<Entry>();
+
+  const handleUpdateJob = () => {
+    if (!updateJob?.id || !selectedStage) return;
+
+    let currentWaitingStageStatus = updateJob?.waitingStageStatus;
+    let currentStageOneStatus = updateJob?.stageOneStatus;
+    let currentStageTwoStatus = updateJob?.stageTwoStatus;
+    let currentStageThreeStatus = updateJob?.stageThreeStatus;
+    let currentWaterWashStageStatus = updateJob?.waterWashStageStatus;
+
+    //get status which is on in progress
+    //update that to completed
+    //update next stage to in progress
+
+    updateTrackingStageStatus(
+      updateJob.id,
+      selectedStage === "1"
+        ? currentWaitingStageStatus !== "COMPLETED"
+          ? "IN_PROGRESS"
+          : "COMPLETED"
+        : currentWaitingStageStatus === "IN_PROGRESS"
+        ? "COMPLETED"
+        : currentWaitingStageStatus,
+      selectedStage === "2"
+        ? currentStageOneStatus !== "COMPLETED"
+          ? "IN_PROGRESS"
+          : "COMPLETED"
+        : currentStageOneStatus === "IN_PROGRESS"
+        ? "COMPLETED"
+        : currentStageOneStatus,
+      selectedStage === "3"
+        ? currentStageTwoStatus !== "COMPLETED"
+          ? "IN_PROGRESS"
+          : "COMPLETED"
+        : currentStageTwoStatus === "IN_PROGRESS"
+        ? "COMPLETED"
+        : currentStageTwoStatus,
+      selectedStage === "4"
+        ? currentStageThreeStatus !== "COMPLETED"
+          ? "IN_PROGRESS"
+          : "COMPLETED"
+        : currentStageThreeStatus === "IN_PROGRESS"
+        ? "COMPLETED"
+        : currentStageThreeStatus,
+      selectedStage === "5"
+        ? currentWaterWashStageStatus !== "COMPLETED"
+          ? "IN_PROGRESS"
+          : "COMPLETED"
+        : currentWaterWashStageStatus === "IN_PROGRESS"
+        ? "COMPLETED"
+        : currentWaterWashStageStatus
+    );
+  };
   return (
     <>
       <div className="relative overflow-x-auto mt-10">
@@ -173,10 +261,7 @@ const Table = (entries: Entry[]) => {
                 </th>
                 <td className="px-6 py-4">{item.vehicleNumber}</td>
                 <td className="px-6 py-4">{item.vehicleModel}</td>
-                <td className="px-6 py-4">
-                  {/* {item.waitingStageStatus} */}
-                  {progressIndicator(item)}
-                </td>
+                <td className="px-6 py-4">{progressIndicator(item)}</td>
                 <td className="px-6 py-4">{item.estimatedDeliveryTimestamp}</td>
                 <td className="px-6 py-4">
                   <button
@@ -184,6 +269,7 @@ const Table = (entries: Entry[]) => {
                     data-modal-toggle="staticModal"
                     onClick={() => {
                       setShowActionsModal(true);
+                      setUpdateJob(item);
                     }}
                     className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                   >
@@ -249,28 +335,6 @@ const Table = (entries: Entry[]) => {
                     Delete Job
                   </button>
                 </div>
-                {/* <div>
-                  <label
-                    htmlFor="changeStage"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Edit Stage
-                  </label>
-                  <select
-                    id="changeStage"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    required
-                  >
-                    <option value="">1</option>
-                    <option value="">2</option>
-                  </select>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm my-5 px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                  Save
-                </button> */}
               </div>
             </div>
           </div>
@@ -288,7 +352,9 @@ const Table = (entries: Entry[]) => {
             {/* Modal content */}
             <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
               <button
-                onClick={() => setShowStageEditModal(false)}
+                onClick={() => {
+                  setShowStageEditModal(false);
+                }}
                 type="button"
                 className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                 data-modal-hide="authentication-modal"
@@ -311,14 +377,6 @@ const Table = (entries: Entry[]) => {
                 <span className="sr-only">Close modal</span>
               </button>
               <div className="px-6 py-6 lg:px-8">
-                <div className="flex">
-                  <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">
-                    Vehicle Number : 1234
-                  </h3>
-                  <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">
-                    Stage : 1
-                  </h3>
-                </div>
                 <div>
                   <label
                     htmlFor="changeStage"
@@ -330,13 +388,23 @@ const Table = (entries: Entry[]) => {
                     id="changeStage"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                     required
+                    onChange={(e) => {
+                      setSelectedStage(e.target.value);
+                    }}
                   >
-                    <option value="">1</option>
-                    <option value="">2</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
                   </select>
                 </div>
                 <button
                   type="submit"
+                  onClick={() => {
+                    handleUpdateJob();
+                    setShowStageEditModal(false);
+                  }}
                   className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm my-5 px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
                   Save
