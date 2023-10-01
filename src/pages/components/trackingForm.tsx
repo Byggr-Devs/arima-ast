@@ -327,6 +327,10 @@ const progressIndicator = (item: Entry) => {
     if (jobStage.status === StatusEnum.COMPLETED) {
       return <div className="w-4 h-4 rounded-full bg-green-500"></div>;
     } else if (jobStage.status === StatusEnum.IN_PROGRESS) {
+      return <div className="w-4 h-4 rounded-full bg-blue-500"></div>;
+    } else if (jobStage.status === StatusEnum.RED_ALERT) {
+      return <div className="w-4 h-4 rounded-full bg-red-500"></div>;
+    } else if (jobStage.status === StatusEnum.YELLOW_ALERT) {
       return <div className="w-4 h-4 rounded-full bg-yellow-500"></div>;
     } else {
       return <div className="w-4 h-4 rounded-full bg-gray-500"></div>;
