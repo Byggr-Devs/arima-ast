@@ -1,4 +1,4 @@
-import React, { Dispatch, ReactElement, SetStateAction } from "react";
+import { Dispatch, ReactElement, SetStateAction } from "react";
 import { useRecoilState } from "recoil";
 import { isAdminAtom } from "../atoms";
 
@@ -42,6 +42,9 @@ export default function SideNav(props: ISideNavProps) {
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
           <ul className="space-y-2 font-medium">
+            <li className="mb-5 text-white font-bold p-2">
+              ARIMA
+            </li>
             <li>
               <a
                 href="#"
@@ -96,7 +99,6 @@ export default function SideNav(props: ISideNavProps) {
                 <span className="flex-1 ml-3 whitespace-nowrap">Signout {isAdmin.toString()}</span>
               </a>
             </li>
-            =
           </ul>
         </div>
       </aside>
