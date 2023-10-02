@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getTrackings } from "../../api/tracking";
 import { Entry, JobStage, StatusEnum, TTrackingForm } from "../../types";
+import { VEHICLE_MODELS } from "../../util";
 import { EditActions } from "./edit";
 
 
@@ -25,23 +26,16 @@ export default function TrackingForm() {
   useEffect(() => {
     // filter trackings according to trackingForm
 
-    console.log("trackingForm");
-
-    if (!trackingForm.vehicleNumber && !trackingForm.Date) {
-      setFilteredData(trackings);
-      return;
-    }
-
-    // subString match for vehicleNumber
-
-    const filteredTrackings = trackings.filter((tracking) => {
+    const filteredByVehicleNumber = trackings.filter((tracking) => {
       if (trackingForm.vehicleNumber) {
         const vehicleNumber = trackingForm.vehicleNumber;
         const trackingVehicleNumber = tracking.vehicleNumber;
         return trackingVehicleNumber.includes(vehicleNumber);
       }
+      return true;
+    });
 
-      // date match
+    const filteredByDate = trackings.filter((tracking) => {
       if (trackingForm.Date) {
         const date = trackingForm.Date;
         const trackingDate = tracking.estimatedDeliveryTimestamp;
@@ -50,7 +44,37 @@ export default function TrackingForm() {
       return true;
     });
 
-    setFilteredData(filteredTrackings);
+    const filteredByVehicleModel = trackings.filter((tracking) => {
+      if (trackingForm.vehicleModel) {
+        const vehicleModel = trackingForm.vehicleModel;
+        const trackingVehicleModel = tracking.vehicleModel;
+        return trackingVehicleModel.includes(vehicleModel);
+      }
+      return true;
+    });
+
+    const filteredByStage = trackings.filter((tracking) => {
+      if (trackingForm.stage) {
+        const stage = trackingForm.stage;
+        const trackingStage = tracking.jobStageStatuses.find(
+          (jobStage) => jobStage.stageId === stage
+        );
+        return trackingStage?.status === "IN_PROGRESS";
+      }
+      return true;
+    });
+
+    const commonFilteredTrackings = trackings.filter((tracking) => {
+      return (
+        filteredByVehicleNumber.includes(tracking) &&
+        filteredByDate.includes(tracking) &&
+        filteredByVehicleModel.includes(tracking) &&
+        filteredByStage.includes(tracking)
+      );
+    }
+    );
+
+    setFilteredData(commonFilteredTrackings);
   }, [trackings, trackingForm]);
 
   return (
@@ -92,10 +116,11 @@ export default function TrackingForm() {
                 vehicleModel: e.target.value,
               });
             }}
-            value={trackingForm.vehicleModel ?? ""}
           >
-            <option>1</option>
-            <option>2</option>
+            <option value="">All Models</option>
+            {VEHICLE_MODELS.map((model) => (
+              <option value={model}>{model}</option>
+            ))}
           </select>
         </div>
         <div className="mb-3">
@@ -108,10 +133,11 @@ export default function TrackingForm() {
             onChange={(e) => {
               setTrackingForm({ ...trackingForm, stage: e.target.value });
             }}
-            value={trackingForm.stage ?? ""}
           >
-            <option>1</option>
-            <option>2</option>
+            <option value="">All Stages</option>
+            {trackings[0]?.jobStageStatuses.map((jobStage) => (
+              <option value={jobStage.stageId}>{jobStage.stage.name}</option>
+            ))}
           </select>
         </div>
 
@@ -150,7 +176,7 @@ export default function TrackingForm() {
   );
 }
 
-const Table = (entries: Entry[], setRefresh:React.Dispatch<React.SetStateAction<boolean>> ) => {
+const Table = (entries: Entry[], setRefresh: React.Dispatch<React.SetStateAction<boolean>>) => {
   return (
     <>
       <div className="relative overflow-x-auto mt-10">
@@ -167,7 +193,7 @@ const Table = (entries: Entry[], setRefresh:React.Dispatch<React.SetStateAction<
                 Model
               </th>
               <th scope="col" className="px-6 py-3 text-center" colSpan={entries[0]?.jobStageStatuses.length}>
-                  Progress Of Service
+                Progress Of Service
               </th>
               <th scope="col" className="px-6 py-3" rowSpan={2}>
                 Estimated Time Of Delivery
@@ -177,12 +203,12 @@ const Table = (entries: Entry[], setRefresh:React.Dispatch<React.SetStateAction<
               </th>
             </tr>
             <tr>
-                {entries[0]?.jobStageStatuses.map((jobStage) => {
-                    return (
-                        <th className="px-6 py-3 text-center">{jobStage.stage.name}</th>
-                    );
-                }
-                )}
+              {entries[0]?.jobStageStatuses.map((jobStage) => {
+                return (
+                  <th className="px-6 py-3 text-center">{jobStage.stage.name}</th>
+                );
+              }
+              )}
             </tr>
           </thead>
           <tbody>
