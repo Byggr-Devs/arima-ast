@@ -1,3 +1,5 @@
+import { ServiceType } from "../types";
+
 interface registerParams {
   serviceCenterId: string;
   ownerName: string;
@@ -6,7 +8,7 @@ interface registerParams {
   phoneNumber: string;
   servicesRequired: string[];
   extraServiceRequired: boolean;
-  extraServiceDays: number;
+  extraServiceHours: number;
   estimatedDeliveryTimestamp: string;
   priority: string;
   startTimestamp: string;
@@ -28,10 +30,7 @@ export async function register(props: registerParams) {
   console.log("registered", response);
   return response.data;
 }
-export interface ServiceType {
-  id: number;
-  name: string;
-}
+
 interface resultFormat {
   serviceTypes: ServiceType[];
   priorities: string[];

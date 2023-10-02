@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import {
-  ServiceType,
   getRegistrationParams,
   register,
 } from "../../api/registration";
+import { ServiceType } from "../../types";
+import { VEHICLE_MODELS } from "../../util";
+import { DropdownCheckbox } from "./dropdownCheckbox";
 
 type TRegistrationForm = {
   serviceCenterId: string;
@@ -13,7 +15,7 @@ type TRegistrationForm = {
   phoneNumber: string;
   servicesRequired: string[];
   extraServiceRequired: boolean;
-  extraServiceDays: number;
+  extraServiceHours: number;
   estimatedDeliveryTimestamp: string;
   priority: string;
 };
@@ -27,7 +29,7 @@ export default function RegistrationForm() {
     phoneNumber: "",
     servicesRequired: [],
     extraServiceRequired: false,
-    extraServiceDays: 0,
+    extraServiceHours: 0,
     estimatedDeliveryTimestamp: "",
     priority: "",
   });
@@ -88,14 +90,17 @@ export default function RegistrationForm() {
           >
             Vehicle Model
           </label>
-          <input
-            type="text"
+          <select
             id="vehicleModel"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            placeholder="RE Classic 350"
             onChange={(e) => handleChange("vehicleModel", e.target.value)}
             required
-          />
+          >
+            <option value="">Select a model</option>
+            {VEHICLE_MODELS.map((model) => (
+              <option value={model}>{model}</option>
+            ))}
+          </select>
         </div>
         <div className="mb-6 flex gap-4 items-baseline">
           <label
@@ -135,30 +140,10 @@ export default function RegistrationForm() {
           >
             Services Required
           </label>
-          {registrationParams.serviceTypes.map((service) => (
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="serviceRequired"
-                name="serviceRequired"
-                value={service.id}
-                onChange={(e) => {
-                  const selectedServices =
-                    registrationForm.servicesRequired ?? [];
-                  if (e.target.checked) {
-                    selectedServices.push(e.target.value);
-                  } else {
-                    selectedServices.splice(
-                      selectedServices.indexOf(e.target.value),
-                      1
-                    );
-                  }
-                  handleChange("servicesRequired", selectedServices);
-                }}
-              />
-              <label htmlFor="serviceRequired">{service.name}</label>
-            </div>
-          ))}
+          <DropdownCheckbox title="Select Services" items={registrationParams.serviceTypes} updateItems={(items)=>{
+            handleChange("servicesRequired", items.map((item)=>item.id));
+          }
+          }/>
         </div>
 
         <div className="mb-6 flex gap-4 items-baseline">
@@ -194,16 +179,16 @@ export default function RegistrationForm() {
         {registrationForm.extraServiceRequired && (
           <div className="mb-6 flex gap-4 items-baseline">
             <label
-              htmlFor="extraServiceDays"
+              htmlFor="extraServiceHours"
               className="block mb-2 text-sm font-medium text-gray-90 w-[11em]"
             >
-              Extra Service Days
+              Extra Service Hours
             </label>
             <input
               type="number"
-              id="extraServiceDays"
+              id="extraServiceHours"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              onChange={(e) => handleChange("extraServiceDays", e.target.value)}
+              onChange={(e) => handleChange("extraServiceHours", e.target.value)}
               required
             />
           </div>
