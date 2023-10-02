@@ -6,6 +6,7 @@ import {
 import { ServiceType } from "../../types";
 import { VEHICLE_MODELS } from "../../util";
 import { DropdownCheckbox } from "./dropdownCheckbox";
+import { Loading } from "./loading";
 
 type TRegistrationForm = {
   serviceCenterId: string;
@@ -34,6 +35,10 @@ export default function RegistrationForm() {
     priority: "",
   });
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
+
   const [registrationParams, setRegistrationParams] = useState<{
     serviceTypes: ServiceType[];
     priorities: string[];
@@ -57,9 +62,19 @@ export default function RegistrationForm() {
     setRegistrationForm({ ...registrationForm, [id]: value });
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    register(registrationForm);
+    setIsLoading(true);
+    setError("");
+    setSuccess("");
+    try {
+      await register(registrationForm);
+      setIsLoading(false);
+      setSuccess("Successfully registered");
+    } catch (error) {
+      setIsLoading(false);
+      setError("Something went wrong");
+    }
     console.log("registrationForm", registrationForm);
   };
   console.log("registrationForm", registrationForm);
@@ -140,10 +155,10 @@ export default function RegistrationForm() {
           >
             Services Required
           </label>
-          <DropdownCheckbox title="Select Services" items={registrationParams.serviceTypes} updateItems={(items)=>{
-            handleChange("servicesRequired", items.map((item)=>item.id));
+          <DropdownCheckbox title="Select Services" items={registrationParams.serviceTypes} updateItems={(items) => {
+            handleChange("servicesRequired", items.map((item) => item.id));
           }
-          }/>
+          } />
         </div>
 
         <div className="mb-6 flex gap-4 items-baseline">
@@ -229,10 +244,15 @@ export default function RegistrationForm() {
         </div>
         <button
           type="submit"
-          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          disabled={isLoading}
+          className="text-white max-h-10 w-40 max-w-30 flex justify-center items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 mx-auto mt-10"
         >
-          Submit
+          {isLoading ?
+            <Loading />
+            : "Submit"}
         </button>
+        {error && <p className="text-red-500">{error}</p>}
+        {success && <p className="text-green-500">{success}</p>}
       </form>
       <div></div>
     </div>
