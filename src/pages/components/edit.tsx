@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { deleteJob } from "../../api/registration";
 import { updateTrackingStageStatus } from "../../api/tracking";
 import { Entry, JobStage, StatusEnum } from "../../types";
 
 interface EditActionsProps {
   item: Entry;
-  setRefresh: React.Dispatch<React.SetStateAction<boolean>>
+  setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const EditActions: React.FC<EditActionsProps> = ({
@@ -13,6 +14,18 @@ export const EditActions: React.FC<EditActionsProps> = ({
 }) => {
   const [show, setShow] = useState(false);
   const [showSubMenu, setShowSubMenu] = useState(false);
+
+  const handleDelete = async () => {
+    if (!item?.id) return;
+    setShowSubMenu(false);
+    setShow(false);
+    try {
+      await deleteJob({ jobId: item.id });
+      setRefresh((prev) => !prev);
+    } catch (error) {
+      //TODO: handle error
+    }
+  };
 
   const handleChangeStage = async (selectedStage: JobStage) => {
     if (!item?.id || !selectedStage) return;
@@ -132,7 +145,11 @@ export const EditActions: React.FC<EditActionsProps> = ({
             </div>
           </li>
           <li>
-            <a href="#" className="block px-4 py-2 hover:bg-gray-100 ">
+            <a
+              href="#"
+              className="block px-4 py-2 hover:bg-gray-100"
+              onClick={handleDelete}
+            >
               Delete
             </a>
           </li>
