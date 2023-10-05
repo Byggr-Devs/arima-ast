@@ -9,6 +9,14 @@ export interface Entry {
   vehicleModel: string;
   estimatedDeliveryTimestamp: string;
   jobStageStatuses: JobStage[];
+  priority: PriorityEnum;
+}
+
+export enum PriorityEnum {
+  LOW = "LOW",
+  MEDIUM = "MEDIUM",
+  HIGH = "HIGH",
+  URGENT = "URGENT",
 }
 
 export enum StatusEnum {

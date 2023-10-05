@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getTrackings } from "../../api/tracking";
-import { Entry, JobStage, StatusEnum, TTrackingForm } from "../../types";
+import { Entry, JobStage, PriorityEnum, StatusEnum, TTrackingForm } from "../../types";
 import { VEHICLE_MODELS } from "../../util";
 import { EditActions } from "./edit";
 
@@ -287,7 +287,7 @@ const Table = (
           </thead>
           <tbody>
             {tableData.map((item, idx) => (
-              <tr className="bg-white border-b" key={item.id}>
+              <tr className={`bg-white border-b border-l-2 ${item.priority===PriorityEnum.URGENT ? "border-l-red-600":''}`} key={item.id}>
                 <th
                   scope="row"
                   className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
