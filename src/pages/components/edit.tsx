@@ -29,6 +29,29 @@ export const EditActions: React.FC<EditActionsProps> = ({
     }
   };
 
+  const handleComplete = async () => {
+    if (!item?.id) return;
+    setShowSubMenu(false);
+    setShow(false);
+    try {
+      await updateTrackingStageStatus(
+        item.id,
+        item?.jobStageStatuses.map((jobStage) => {
+          if (jobStage.status !== StatusEnum.COMPLETED) {
+            return {
+              ...jobStage,
+              status: StatusEnum.COMPLETED,
+            };
+          }
+          return jobStage;
+        })
+      );
+      setRefresh((prev) => !prev);
+    } catch (error) {
+      //TODO: handle error
+    }
+  }
+
   const handleChangeStage = async (selectedStage: JobStage) => {
     if (!item?.id || !selectedStage) return;
     setShowSubMenu(false);
@@ -146,6 +169,15 @@ export const EditActions: React.FC<EditActionsProps> = ({
                 ))}
               </ul>
             </div>
+          </li>
+          <li>
+            <a
+              href="#"
+              className="block px-4 py-2 hover:bg-gray-100"
+              onClick={handleComplete}
+            >
+              Complete Job
+            </a>
           </li>
           <li>
             <a
