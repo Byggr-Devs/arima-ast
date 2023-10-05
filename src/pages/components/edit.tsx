@@ -6,11 +6,13 @@ import { Entry, JobStage, StatusEnum } from "../../types";
 interface EditActionsProps {
   item: Entry;
   setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
+  isAdmin: boolean;
 }
 
 export const EditActions: React.FC<EditActionsProps> = ({
   item,
   setRefresh,
+  isAdmin,
 }) => {
   const [show, setShow] = useState(false);
   const [showSubMenu, setShowSubMenu] = useState(false);
@@ -72,6 +74,7 @@ export const EditActions: React.FC<EditActionsProps> = ({
         onClick={() => setShow(!show)}
         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5 inline-flex items-center justify-between"
         type="button"
+        disabled={!isAdmin}
       >
         Edit
         <svg
