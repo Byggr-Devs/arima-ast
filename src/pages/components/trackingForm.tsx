@@ -212,6 +212,8 @@ const Table = (
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const [tableData, setTableData] = useState<Entry[]>([]);
 
+  const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
+
   // Function to slice data for the current page
   const getCurrentPageData = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -246,6 +248,12 @@ const Table = (
     const time = hour + ":" + min + " " + ampm;
     return day + "-" + month + "-" + year + "," + time;
   };
+
+  const handleRowClick = (item: Entry) => {
+    console.log("item", item);
+    setSelectedEntry(item);
+  }
+
   return (
     <>
       <div className="relative mt-10">
@@ -287,14 +295,14 @@ const Table = (
           </thead>
           <tbody>
             {tableData.map((item, idx) => (
-              <tr className={`bg-white border-b border-l-2 ${item.priority===PriorityEnum.URGENT ? "border-l-red-600":''}`} key={item.id}>
+              <tr className={`hover:bg-gray-100 bg-white border-b border-l-2 ${item.priority === PriorityEnum.URGENT ? "border-l-red-600" : ''}`} key={item.id}>
                 <th
                   scope="row"
                   className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
                 >
                   {(currentPage - 1) * 10 + idx + 1}
                 </th>
-                <td className="px-6 py-4">{item.vehicleNumber}</td>
+                <td onClick={() => handleRowClick(item)} className="px-6 py-4 hover:underline hover:cursor-pointer underline-offset-2">{item.vehicleNumber}</td>
                 <td className="px-6 py-4">{item.vehicleModel}</td>
                 {item.jobStageStatuses.map((jobStage) => {
                   return (
@@ -317,6 +325,31 @@ const Table = (
             ))}
           </tbody>
         </table>
+        {/* Modal */}
+        {selectedEntry && <div onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setSelectedEntry(null);
+          }
+        }} className="absolute top-0 left-0 backdrop-blur-sm h-full w-full flex justify-center items-center">
+          <div onClick={() => { }} className="w-[60%] h-[80%] bg-white rounded-md border-2 p-4">
+            {/* display details of current Entry */}
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-4">
+                <div className="w-6 h-6 inline-block rounded-full bg-green-500"></div>
+                <div className="text-lg font-medium">
+                  {selectedEntry?.vehicleNumber}
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-6 h-6 inline-block rounded-full bg-green-500"></div>
+                <div className="text-lg font-medium">
+                  {selectedEntry?.vehicleModel}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        }
 
         <div className="flex justify-end mt-4">
           {/* Pagination */}
@@ -332,11 +365,10 @@ const Table = (
                     <button
                       key={pageNumber}
                       onClick={() => handlePageChange(pageNumber)}
-                      className={`w-8 md:flex justify-center items-center hidden hover:bg-blue-500 focus:outline-none ${
-                        pageNumber === currentPage
-                          ? "bg-blue-500 text-white"
-                          : "text-gray-700"
-                      }`}
+                      className={`w-8 md:flex justify-center items-center hidden hover:bg-blue-500 focus:outline-none ${pageNumber === currentPage
+                        ? "bg-blue-500 text-white"
+                        : "text-gray-700"
+                        }`}
                     >
                       {/* show only next 3 pages*/}
                       {/* {pageNumber >= currentPage &&
