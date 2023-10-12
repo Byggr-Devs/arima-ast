@@ -10,6 +10,7 @@ export interface Entry {
   estimatedDeliveryTimestamp: string;
   jobStageStatuses: JobStage[];
   priority: PriorityEnum;
+  ownerPhone: string;
 }
 
 export enum PriorityEnum {
@@ -36,6 +37,10 @@ export type JobStage = {
   stageId: string;
   status: StatusEnum;
   stage: Stage;
+  startTimestamp?: string;
+  endTimestamp?: string;
+  entryImageUrl?: string;
+  exitImageUrl?: string;
 };
 
 export type TTrackingForm = {

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { getTrackings } from "../../api/tracking";
 import { Entry, JobStage, PriorityEnum, StatusEnum, TTrackingForm } from "../../types";
-import { VEHICLE_MODELS } from "../../util";
+import { VEHICLE_MODELS, displayFormat } from "../../util";
+import { Detail } from "./Detail";
 import { EditActions } from "./edit";
 import { Modal } from "./model";
+
 
 export default function TrackingForm() {
   const [trackings, setTrackings] = useState<Entry[]>([]);
@@ -233,22 +235,6 @@ const Table = (
     const endIndex = startIndex + itemsPerPage;
     setTableData(entries.slice(startIndex, endIndex));
   };
-  const displayFormat = (date: string) => {
-    // convert to dd-mm-yyyy hr:min AM/PM format
-    // add 0 if date or month is single digit
-
-    const d = new Date(date);
-    const day = d.getDate() < 10 ? "0" + d.getDate() : d.getDate();
-    const month =
-      d.getMonth() + 1 < 10 ? "0" + (d.getMonth() + 1) : d.getMonth() + 1;
-    const year = d.getFullYear();
-    let hour: string | number = d.getHours();
-    const min = d.getMinutes() < 10 ? "0" + d.getMinutes() : d.getMinutes();
-    const ampm = Number(hour) >= 12 ? "PM" : "AM";
-    if (Number(hour) > 12) hour = String(Number(hour) - 12);
-    const time = hour + ":" + min + " " + ampm;
-    return day + "-" + month + "-" + year + "," + time;
-  };
 
   const handleRowClick = (item: Entry) => {
     console.log("item", item);
@@ -296,14 +282,25 @@ const Table = (
           </thead>
           <tbody>
             {tableData.map((item, idx) => (
-              <tr className={`hover:bg-gray-100 bg-white border-b border-l-2 ${item.priority === PriorityEnum.URGENT ? "border-l-red-600" : ''}`} key={item.id}>
+              <tr
+                className={`hover:bg-gray-100 bg-white border-b border-l-2 ${item.priority === PriorityEnum.URGENT
+                  ? "border-l-red-600"
+                  : ""
+                  }`}
+                key={item.id}
+              >
                 <th
                   scope="row"
                   className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
                 >
                   {(currentPage - 1) * 10 + idx + 1}
                 </th>
-                <td onClick={() => handleRowClick(item)} className="px-6 py-4 hover:underline hover:cursor-pointer underline-offset-2">{item.vehicleNumber}</td>
+                <td
+                  onClick={() => handleRowClick(item)}
+                  className="px-6 py-4 hover:underline hover:cursor-pointer underline-offset-2"
+                >
+                  {item.vehicleNumber}
+                </td>
                 <td className="px-6 py-4">{item.vehicleModel}</td>
                 {item.jobStageStatuses.map((jobStage) => {
                   return (
@@ -327,11 +324,16 @@ const Table = (
           </tbody>
         </table>
         {/* Modal */}
-        {selectedEntry && 
-          <Modal visible={selectedEntry !== null} onCancel={() => setSelectedEntry(null)} onOk={() => setSelectedEntry(null)} title="Tracking Details">
-          kslk
+        {selectedEntry && (
+          <Modal
+            visible={selectedEntry !== null}
+            onCancel={() => setSelectedEntry(null)}
+            onOk={() => setSelectedEntry(null)}
+            title="Tracking Details"
+          >
+            <Detail selectedEntry={selectedEntry} />
           </Modal>
-        }
+        )}
 
         <div className="flex justify-end mt-4">
           {/* Pagination */}
