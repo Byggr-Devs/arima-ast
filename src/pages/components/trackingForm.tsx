@@ -3,6 +3,7 @@ import { getTrackings } from "../../api/tracking";
 import { Entry, JobStage, PriorityEnum, StatusEnum, TTrackingForm } from "../../types";
 import { VEHICLE_MODELS } from "../../util";
 import { EditActions } from "./edit";
+import { Modal } from "./model";
 
 export default function TrackingForm() {
   const [trackings, setTrackings] = useState<Entry[]>([]);
@@ -256,7 +257,7 @@ const Table = (
 
   return (
     <>
-      <div className="relative mt-10">
+      <div className="mt-10">
         <table className="w-full text-sm text-left text-gray-500">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
@@ -326,29 +327,10 @@ const Table = (
           </tbody>
         </table>
         {/* Modal */}
-        {selectedEntry && <div onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            setSelectedEntry(null);
-          }
-        }} className="absolute top-0 left-0 backdrop-blur-sm h-full w-full flex justify-center items-center">
-          <div onClick={() => { }} className="w-[60%] h-[80%] bg-white rounded-md border-2 p-4">
-            {/* display details of current Entry */}
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-4">
-                <div className="w-6 h-6 inline-block rounded-full bg-green-500"></div>
-                <div className="text-lg font-medium">
-                  {selectedEntry?.vehicleNumber}
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="w-6 h-6 inline-block rounded-full bg-green-500"></div>
-                <div className="text-lg font-medium">
-                  {selectedEntry?.vehicleModel}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {selectedEntry && 
+          <Modal visible={selectedEntry !== null} onCancel={() => setSelectedEntry(null)} onOk={() => setSelectedEntry(null)} title="Tracking Details">
+          kslk
+          </Modal>
         }
 
         <div className="flex justify-end mt-4">
