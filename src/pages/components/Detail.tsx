@@ -34,7 +34,7 @@ export const Detail: React.FC<DetailProps> = (props) => {
             <Carousel className="mt-6" showThumbs={false} selectedItem={0} onChange={(idx) => { setSelectedJobStage(selectedEntry.jobStageStatuses[idx]) }}>
                 {selectedEntry.jobStageStatuses.map((jobStage) => {
                     return (
-                        <div className="h-[30rem]">
+                        <div className="h-[50vh]">
                             <div className="w-[100%] h-full flex items-center justify-center gap-1">
                                 <div className="w-[50%] bg-gray-300 h-full flex items-center justify-center relative">
                                     <p className="absolute top-6 left-4 font-bold">Entry Image</p>
