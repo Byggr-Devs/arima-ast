@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getTrackings } from "../../api/tracking";
 import { Entry, JobStage, PriorityEnum, StatusEnum, TTrackingForm } from "../../types";
-import { VEHICLE_MODELS, displayFormat } from "../../util";
+import { VEHICLE_MODELS, tableDatedisplayFormat } from "../../util";
 import { Detail } from "./Detail";
 import { EditActions } from "./edit";
 import { Modal } from "./model";
@@ -56,8 +56,8 @@ export default function TrackingForm() {
     // filter trackings according to trackingForm
     const filteredByVehicleNumber = trackings.filter((tracking) => {
       if (trackingForm.vehicleNumber) {
-        const vehicleNumber = trackingForm.vehicleNumber;
-        const trackingVehicleNumber = tracking.vehicleNumber;
+        const vehicleNumber = trackingForm.vehicleNumber.toLocaleLowerCase();
+        const trackingVehicleNumber = tracking.vehicleNumber.toLocaleLowerCase();
         return trackingVehicleNumber.includes(vehicleNumber);
       }
       return true;
@@ -170,7 +170,7 @@ export default function TrackingForm() {
 
         <div className="mb-3">
           <label className="block mb-2 text-sm font-medium text-gray-90">
-            Date
+            Estimated Time Of Delivery
           </label>
           <input
             type="datetime-local"
@@ -283,10 +283,11 @@ const Table = (
           <tbody>
             {tableData.map((item, idx) => (
               <tr
-                className={`hover:bg-gray-100 bg-white border-b border-l-2 ${item.priority === PriorityEnum.URGENT
+                className={`hover:bg-gray-100 bg-white border-b border-l-4 hover:underline hover:cursor-pointer underline-offset-2 ${item.priority === PriorityEnum.URGENT
                   ? "border-l-red-600"
                   : ""
                   }`}
+                onClick={() => handleRowClick(item)}
                 key={item.id}
               >
                 <th
@@ -296,8 +297,7 @@ const Table = (
                   {(currentPage - 1) * 10 + idx + 1}
                 </th>
                 <td
-                  onClick={() => handleRowClick(item)}
-                  className="px-6 py-4 hover:underline hover:cursor-pointer underline-offset-2"
+                  className="px-6 py-4"
                 >
                   {item.vehicleNumber}
                 </td>
@@ -310,9 +310,9 @@ const Table = (
                   );
                 })}
                 <td className="px-6 py-4">
-                  {displayFormat(item.estimatedDeliveryTimestamp)}
+                  {tableDatedisplayFormat(item.estimatedDeliveryTimestamp)}
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-4" onClick={(event) => event.stopPropagation()}>
                   <EditActions
                     item={item}
                     setRefresh={setRefresh}
@@ -336,40 +336,37 @@ const Table = (
         )}
 
         <div className="flex justify-end mt-4">
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center">
-              <div className="mr-2 text-sm text-gray-700">
-                Page {currentPage} of {totalPages}
-              </div>
-              <div className="flex h-8 font-medium rounded-lg bg-gray-200">
-                {[...Array(totalPages)].map((_, idx) => {
-                  const pageNumber = idx + 1;
-                  return (
-                    <button
-                      key={pageNumber}
-                      onClick={() => handlePageChange(pageNumber)}
-                      className={`w-8 md:flex justify-center items-center hidden hover:bg-blue-500 focus:outline-none ${pageNumber === currentPage
-                        ? "bg-blue-500 text-white"
-                        : "text-gray-700"
-                        }`}
-                    >
-                      {/* show only next 3 pages*/}
-                      {/* {pageNumber >= currentPage &&
-                      pageNumber <= currentPage + 2 ? (
-                        <span>{pageNumber}</span>
-                      ) : (
-                        ""
-                      )} */}
-                      {/* show only previous 3 pages */}
+          {/* show total number of records */}
+          <div className="flex items-center pr-5">
+            <span className="text-sm text-gray-700">
+              Total Number of Records :  {totalItems}
+            </span>
+          </div>
 
-                      {pageNumber}
-                    </button>
-                  );
-                })}
-              </div>
+          <div className="flex items-center">
+            <div className="mr-2 text-sm text-gray-700">
+              Page {currentPage} of {totalPages}
             </div>
-          )}
+            <div className="flex h-8 font-medium rounded-lg bg-gray-200">
+              {[...Array(totalPages)].map((_, idx) => {
+                const pageNumber = idx + 1;
+                return (
+                  <button
+                    key={pageNumber}
+                    onClick={() => handlePageChange(pageNumber)}
+                    className={`w-8 md:flex justify-center items-center hidden hover:bg-blue-500 focus:outline-none ${pageNumber === currentPage
+                      ? "bg-blue-500 text-white"
+                      : "text-gray-700"
+                      }`}
+                  >
+
+                    {pageNumber}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
 
           {/* Previous and Next buttons */}
 

@@ -27,6 +27,7 @@ export const Detail: React.FC<DetailProps> = (props) => {
     return (
         <>
             <div className="flex justify-between flex-col">
+                <p><span className="font-semibold mr-2">Vehicle Owner:</span> <span className={``}>{selectedEntry.ownerName}</span></p>
                 <p><span className="font-semibold mr-2">Vehicle Number:</span> <span className={``}>{selectedEntry.vehicleNumber}</span></p>
                 <p><span className="font-semibold mr-2">Vehicle Model:</span> <span className={``}>{selectedEntry.vehicleModel}</span></p>
                 <p><span className="font-semibold mr-2">Owner Phone Number:</span> <span className={``}>{selectedEntry.ownerPhone}</span></p>
