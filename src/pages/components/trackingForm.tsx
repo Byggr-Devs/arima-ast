@@ -294,7 +294,7 @@ const Table = (
                   scope="row"
                   className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
                 >
-                  {(currentPage - 1) * 10 + idx + 1}
+                  {(currentPage - 1) * 10 + idx + 1} {item.isPinned ? <span className="text-red-500">📌</span> : ""}
                 </th>
                 <td
                   className="px-6 py-4"

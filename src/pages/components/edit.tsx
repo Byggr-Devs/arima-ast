@@ -44,13 +44,31 @@ export const EditActions: React.FC<EditActionsProps> = ({
             };
           }
           return jobStage;
-        })
+        }),
+        item.isPinned
       );
       setRefresh((prev) => !prev);
     } catch (error) {
       //TODO: handle error
     }
   }
+
+  const handlePin = async () => {
+    if (!item?.id) return;
+    setShowSubMenu(false);
+    setShow(false);
+    try {
+      await updateTrackingStageStatus(
+        item.id,
+        item?.jobStageStatuses,
+        !item.isPinned
+      );
+      setRefresh((prev) => !prev);
+    } catch (error) {
+      //TODO: handle error
+    }
+  }
+
 
   const handleChangeStage = async (selectedStage: JobStage) => {
     if (!item?.id || !selectedStage) return;
@@ -84,7 +102,8 @@ export const EditActions: React.FC<EditActionsProps> = ({
             };
           }
           return jobStage;
-        })
+        }),
+        item.isPinned
       );
       setRefresh((prev) => !prev);
     } catch (error) {
@@ -169,6 +188,15 @@ export const EditActions: React.FC<EditActionsProps> = ({
                 ))}
               </ul>
             </div>
+          </li>
+          <li>
+            <a
+              href="#"
+              className="block px-4 py-2 hover:bg-gray-100"
+              onClick={handlePin}
+            >
+              {item.isPinned ? "Unpin" : "Pin"}
+            </a>
           </li>
           <li>
             <a

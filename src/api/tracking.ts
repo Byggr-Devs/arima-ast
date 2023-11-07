@@ -8,7 +8,16 @@ export async function getTrackings() {
 
 export async function updateTrackingStageStatus(
   jobId: string,
-  jobStageStatuses: {status: "WAITING"|"IN_PROGRESS"|"COMPLETED"|"YELLOW_ALERT"|"RED_ALERT", stageId: string}[]
+  jobStageStatuses: {
+    status:
+      | "WAITING"
+      | "IN_PROGRESS"
+      | "COMPLETED"
+      | "YELLOW_ALERT"
+      | "RED_ALERT";
+    stageId: string;
+  }[],
+  isPinned: boolean
 ) {
   const response = await fetch(`http://localhost:8000/update-job`, {
     method: "POST",
@@ -17,7 +26,8 @@ export async function updateTrackingStageStatus(
     },
     body: JSON.stringify({
       jobId,
-      jobStageStatuses
+      jobStageStatuses,
+      isPinned,
     }),
   }).then((res) => res.json());
   console.log("updated", response);

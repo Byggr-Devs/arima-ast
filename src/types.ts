@@ -11,6 +11,8 @@ export interface Entry {
   jobStageStatuses: JobStage[];
   priority: PriorityEnum;
   ownerPhone: string;
+  ownerName: string;
+  isPinned: boolean;
 }
 
 export enum PriorityEnum {
