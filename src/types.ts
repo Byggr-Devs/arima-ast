@@ -50,4 +50,5 @@ export type TTrackingForm = {
   vehicleModel: string;
   stage: string;
   Date: string;
+  alert: string;
 };

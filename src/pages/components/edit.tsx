@@ -83,6 +83,7 @@ export const EditActions: React.FC<EditActionsProps> = ({
       await updateTrackingStageStatus(
         item.id,
         jobStageStatuses.map((jobStage) => {
+          if (selectedStage.stageId === jobStage.stageId) return jobStage;
           if (
             (jobStage.status === StatusEnum.IN_PROGRESS  || jobStage.status === StatusEnum.RED_ALERT ||jobStage.status=== StatusEnum.YELLOW_ALERT) &&
             jobStage.stageId !== selectedStage.stageId

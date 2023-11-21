@@ -14,6 +14,7 @@ export default function TrackingForm() {
     vehicleModel: "",
     stage: "",
     Date: "",
+    alert: "",
   });
   const [filteredData, setFilteredData] = useState<Entry[]>(trackings);
   const [refresh, setRefresh] = useState<boolean>(false);
@@ -93,12 +94,24 @@ export default function TrackingForm() {
       return true;
     });
 
+    const filterByAlertLevel = trackings.filter((tracking) => {
+      if (trackingForm.alert) {
+        const alert = trackingForm.alert;
+        const trackingAlert = tracking.jobStageStatuses.find(
+          (jobStage) => jobStage.status === alert
+        );
+        return trackingAlert?.status === alert;
+      }
+      return true;
+    });
+
     const commonFilteredTrackings = trackings.filter((tracking) => {
       return (
         filteredByVehicleNumber.includes(tracking) &&
         filteredByDate.includes(tracking) &&
         filteredByVehicleModel.includes(tracking) &&
-        filteredByStage.includes(tracking)
+        filteredByStage.includes(tracking) &&
+        filterByAlertLevel.includes(tracking)
       );
     });
 
@@ -107,7 +120,7 @@ export default function TrackingForm() {
 
   return (
     <div className="p-4 flex gap-4 flex-col">
-      <form className="grid grid-cols-5 gap-2">
+      <form className="grid grid-cols-6 gap-2">
         <div className="mb-6">
           <label
             htmlFor="vehicleNumber"
@@ -171,7 +184,7 @@ export default function TrackingForm() {
 
         <div className="mb-3">
           <label className="block mb-2 text-sm font-medium text-gray-90">
-            Estimated Time Of Delivery
+            Est. Time Of Delivery
           </label>
           <input
             type="datetime-local"
@@ -183,6 +196,23 @@ export default function TrackingForm() {
             value={trackingForm.Date ?? ""}
           />
         </div>
+        <div className="mb-3">
+          <label className="block mb-2 text-sm font-medium text-gray-90">
+            Alert Level
+          </label>
+          <select
+            id="alert"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            onChange={(e) => {
+              setTrackingForm({ ...trackingForm, alert: e.target.value });
+            }}
+          >
+            <option value="">All Alerts</option>
+            <option value="RED_ALERT">Red Alert</option>
+            <option value="YELLOW_ALERT">Yellow Alert</option>
+          </select>
+        </div>
+
         <button
           type="submit"
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-fit px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 self-center ml-3"
@@ -193,6 +223,7 @@ export default function TrackingForm() {
               vehicleModel: "",
               stage: "",
               Date: "",
+              alert: "",
             });
           }}
         >
