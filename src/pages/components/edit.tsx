@@ -84,7 +84,7 @@ export const EditActions: React.FC<EditActionsProps> = ({
         item.id,
         jobStageStatuses.map((jobStage) => {
           if (
-            jobStage.status === StatusEnum.IN_PROGRESS &&
+            (jobStage.status === StatusEnum.IN_PROGRESS  || jobStage.status === StatusEnum.RED_ALERT ||jobStage.status=== StatusEnum.YELLOW_ALERT) &&
             jobStage.stageId !== selectedStage.stageId
           ) {
             return {
@@ -93,8 +93,7 @@ export const EditActions: React.FC<EditActionsProps> = ({
             };
           }
           if (
-            jobStage.stageId === selectedStage.stageId &&
-            jobStage.status !== StatusEnum.COMPLETED
+            jobStage.stageId === selectedStage.stageId
           ) {
             return {
               ...jobStage,

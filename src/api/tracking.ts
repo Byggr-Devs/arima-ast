@@ -33,3 +33,9 @@ export async function updateTrackingStageStatus(
   console.log("updated", response);
   return response.data;
 }
+
+export async function processJobAlerts() {
+  const response = await fetch(`http://localhost:8000/process-jobs`).then((res) => res.json());
+  console.log("processed", response);
+  return response.data;
+}

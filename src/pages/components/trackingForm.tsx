@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getTrackings } from "../../api/tracking";
+import { getTrackings, processJobAlerts } from "../../api/tracking";
 import { Entry, JobStage, PriorityEnum, StatusEnum, TTrackingForm } from "../../types";
 import { VEHICLE_MODELS, tableDatedisplayFormat } from "../../util";
 import { Detail } from "./Detail";
@@ -46,6 +46,7 @@ export default function TrackingForm() {
     // Set up the interval to fetch trackings every 5 seconds
     const interval = setInterval(() => {
       fetchTrackings();
+      processJobAlerts();
     }, 5000);
 
     // Cleanup function to clear the interval when the component unmounts
