@@ -157,6 +157,7 @@ export default function TrackingForm() {
                 vehicleModel: e.target.value,
               });
             }}
+            value={trackingForm.vehicleModel ?? ""}
           >
             <option value="">All Models</option>
             {VEHICLE_MODELS.map((model) => (
@@ -174,6 +175,7 @@ export default function TrackingForm() {
             onChange={(e) => {
               setTrackingForm({ ...trackingForm, stage: e.target.value });
             }}
+            value={trackingForm.stage ?? ""}
           >
             <option value="">All Stages</option>
             {trackings[0]?.jobStageStatuses.map((jobStage) => (
@@ -206,6 +208,7 @@ export default function TrackingForm() {
             onChange={(e) => {
               setTrackingForm({ ...trackingForm, alert: e.target.value });
             }}
+            value={trackingForm.alert ?? ""}
           >
             <option value="">All Alerts</option>
             <option value="RED_ALERT">Red Alert</option>
